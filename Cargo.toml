@@ -1,0 +1,30 @@
+[package]
+name = "rust-thanos"
+version = "0.1.0"
+edition = "2021"
+license = "MIT"
+description = "An efficient Minecraft Java world optimization tool to detect and remove unused chunks"
+homepage = "https://github.com/wangzhizhou/rust-thanos"
+repository = "https://github.com/wangzhizhou/rust-thanos.git"
+readme = "README.md"
+keywords = ["minecraft", "world", "optimization", "chunks", "rust"]
+categories = ["command-line-utilities", "games", "filesystem"]
+
+[dependencies]
+anyhow = "1"
+clap = { version = "4", features = ["derive"] }
+walkdir = "2"
+rayon = "1"
+flate2 = { version = "1", features = ["zlib"] }
+lz4_flex = "0.11"
+fastnbt = "2"
+byteorder = "1"
+regex = "1"
+thiserror = "1"
+uuid = { version = "1", features = ["v4"] }
+xxhash-rust = { version = "0.8", features = ["xxh32"] }
+log = "0.4"
+env_logger = "0.11"
+indicatif = "0.17"
+fs_extra = "1"
+console = "0.15"
