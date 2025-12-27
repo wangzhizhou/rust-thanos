@@ -13,6 +13,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::atomic::{AtomicU64, AtomicUsize, Ordering};
 use std::sync::Arc;
+use walkdir::WalkDir;
 
 fn is_dimension_dir(path: &Path) -> bool {
     path.join("region").is_dir()
@@ -186,14 +187,23 @@ pub fn run(
         fs::create_dir_all(&out)?;
     }
     let mut tasks = Vec::new();
+    if is_dimension_dir(&input) {
+        tasks.push(input.clone());
+    }
     for entry in fs::read_dir(&input)? {
         let p = entry?.path();
         if p.is_dir() && is_dimension_dir(&p) {
             tasks.push(p);
         }
     }
-    if is_dimension_dir(&input) {
-        tasks.push(input.clone());
+    for entry in WalkDir::new(&input).into_iter().filter_map(|e| e.ok()) {
+        let p = entry.path();
+        if p.is_dir() && is_dimension_dir(p) {
+            let pb = p.to_path_buf();
+            if !tasks.iter().any(|t| t == &pb) {
+                tasks.push(pb);
+            }
+        }
     }
     let _total_regions = count_total_regions(&tasks);
     let total_chunks = count_total_chunks(&tasks);
@@ -210,11 +220,12 @@ pub fn run(
     let global_pb = if global_enabled {
         let (_, cols) = term.size();
         let reserve = 40u16; // spinner + numbers + percent + msg space
-        let bar_width = if cols > reserve {
+        let mut bar_width = if cols > reserve {
             (cols - reserve) as usize
         } else {
             20usize
         };
+        bar_width = bar_width.min(50);
         let pb = mp.add(ProgressBar::new(total_chunks.max(1)));
         let style = ProgressStyle::with_template(&format!("{{spinner:.green}} {{bar:{width}.cyan/blue}} {{pos}}/{{len}} 区块 {{percent}}% {{msg}}", width=bar_width))
             .unwrap()
