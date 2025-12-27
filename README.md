@@ -23,7 +23,14 @@
 ### 通过 Homebrew 安装
 
 ```bash
-brew tap orzgeeker/core && brew install rust-thanos
+# 添加私有源
+brew tap orzgeeker/core
+# 安装
+brew install rust-thanos
+# 卸载
+brew uninstall rust-thanos
+# 移除私有源
+brew untap orzgeeker/core
 ```
 
 ### 从源代码构建
